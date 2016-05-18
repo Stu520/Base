@@ -1,0 +1,8 @@
+
+import android.support.v7.app.ActionBarActivity;
+
+public class BaseActivity extends ActionBarActivity {
+	//项目中标题,需要用到actionbar,所以让所有的activity都继承至ActionBarActivity
+	//如果使用ActionBarActivity作为所有activity父类,添加样式主题:android:theme="@style/Theme.AppCompat.Light",如果不加,则运行报错
+	//ActionBarActivity中可以调用到getSupportFragmentMananger()方法
+}
