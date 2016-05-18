@@ -1,0 +1,110 @@
+import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.view.MenuItem;
+
+public class MainActivity extends BaseActivity {
+	private ActionBar supportActionBar;
+	private ActionBarDrawerToggle actionBarDrawerToggle;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		
+		//1,获取指针自定义控件和viewPager
+		PagerTab pagerTab = (PagerTab) findViewById(R.id.pagerTab);
+		ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+		//2,给viewPager准备数据适配器
+		MyAdapter myAdapter = new MyAdapter(getSupportFragmentManager());
+		viewPager.setAdapter(myAdapter);
+		//3,viewpager和指针绑定
+		pagerTab.setViewPager(viewPager);
+		//4,给每一个根据索引生的fragment去维护onCreateView方法中返回的界面效果
+		
+		//5,给指针做一个选中界面的事件监听,选中某个界面,就请求某个界面的网络数据
+		pagerTab.setOnPageChangeListener(new OnPageChangeListener() {
+			@Override
+			public void onPageSelected(int position) {
+				BaseFragment baseFragment = FragmentFactory.createFragment(position);
+				baseFragment.subShow();
+			}
+			
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+				
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+				
+			}
+		});
+		
+		//初始actionBar对象
+		initActionBar();
+	}
+	
+	private void initActionBar() {
+		//获取
+		supportActionBar = getSupportActionBar();
+		//设置左上角可以给按钮设置图片
+		supportActionBar.setDisplayHomeAsUpEnabled(true);
+		//设置左上角的按钮可以被点击
+		supportActionBar.setHomeButtonEnabled(true);
+		//修改左上角应用名称
+		supportActionBar.setTitle(UIUtils.getString(R.string.app_name));
+		
+		DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
+		//让左上角的按钮在点击的过程中可以将侧拉菜单拖拽出来
+		actionBarDrawerToggle = new ActionBarDrawerToggle(
+				this, 
+				drawerLayout, 
+				R.drawable.ic_drawer_am, 
+				R.string.drawer_open, 
+				R.string.drawer_close);
+		//同步手势和按钮的状态
+		actionBarDrawerToggle.syncState();
+	}
+
+	//结合Fragment在viewPager中去做展示
+	class MyAdapter extends FragmentPagerAdapter{
+		private String[] stringArrays;
+
+		public MyAdapter(FragmentManager fm) {
+			super(fm);
+			stringArrays = UIUtils.getStringArray(R.array.tab_names);
+		}
+		//根据索引去创建fragment对象,并且返回此fragment
+		//返回的fragment中对应的onCreateView方法中返回的view,就等同于PagerAdatper中instantiateItem方法中需要去添加view对象
+		//FragmentPagerAdapter会自动将根据索引position生成的fragment中onCreateView中的view添加到viewPager内部,不需要手动添加
+		@Override
+		public Fragment getItem(int position) {
+			//Fragment的工厂类中去统一提供,根据传递进来的索引,生成此索引对应fragment
+			return FragmentFactory.createFragment(position);
+		}
+		//返回viewPager中展示界面总数的方法
+		@Override
+		public int getCount() {
+			//获取指针标题的数组的长度,即为viewPager页面的个数
+			return stringArrays.length;
+		}
+		
+		//给指针自定义控件设置标题方法
+		@Override
+		public CharSequence getPageTitle(int position) {
+			return stringArrays[position];
+		}
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		return super.onOptionsItemSelected(item) || actionBarDrawerToggle.onOptionsItemSelected(item);
+	}
+}
