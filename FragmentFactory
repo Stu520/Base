@@ -1,0 +1,38 @@
+public class FragmentFactory {
+	private static HashMap<Integer, BaseFragment> hashMap = new HashMap<Integer, BaseFragment>();
+	public static BaseFragment createFragment(int position) {
+		BaseFragment baseFragment = null;
+		baseFragment = hashMap.get(position);
+		if(baseFragment !=null){
+			//根据索引获取到了fragment对象,直接返回即可
+			return baseFragment;
+		}else{
+			//在没有此索引指向fragment的时候创建逻辑
+			switch (position) {
+			case 0:
+				baseFragment = new HomeFragment();
+				break;
+			case 1:
+				baseFragment = new AppFragment();
+				break;
+			case 2:
+				baseFragment = new GameFragment();
+				break;
+			case 3:
+				baseFragment = new SubjectFragment();
+				break;
+			case 4:
+				baseFragment = new RecommendFragment();
+				break;
+			case 5:
+				baseFragment = new CategoryFragment();
+				break;
+			case 6:
+				baseFragment = new HotFragment();
+				break;
+			}
+			hashMap.put(position, baseFragment);
+			return baseFragment;
+		}
+	}
+}
