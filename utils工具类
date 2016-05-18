@@ -1,0 +1,93 @@
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.preference.PreferenceManager;
+import android.text.format.DateFormat;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageButton;
+
+import cn.itcast.player.interfaces.IKeys;
+import cn.itcast.player.util.service.AudioPlayService;
+
+/**
+ * Created by Administrator on 2016/2/9.
+ */
+public class Utils {
+
+    /**
+     * 查找一个布局中所有的Button和ImageButton并设置点击事件
+     *
+     * @param root 要查找的布局
+     * @param listener 点击监听器
+     */
+	/**
+	 * 查找一个布局中所有的按钮(Button或ImageButton)并设置点击事件
+	 * @param view
+	 */
+	public static void findButtonAndSetListener(View view, OnClickListener listener) {
+		if (view instanceof ViewGroup) {
+			ViewGroup parent = (ViewGroup) view;
+			int size = parent.getChildCount();
+			for (int i = 0; i < size ; i ++) {
+				View child = parent.getChildAt(i);
+				if (child instanceof Button || child instanceof ImageButton) {
+					// 设置按钮点击事件
+					child.setOnClickListener(listener);
+				} else if (child instanceof ViewGroup) {
+					findButtonAndSetListener(child, listener);
+				}
+			}
+		}
+	}
+
+    /**
+     * 打印查询出来的所有的数据
+     * @param cursor
+     */
+    public static void printCursor(Cursor cursor) {
+        if (cursor == null) {
+            return;
+        }
+
+        LogUtil.i("---------------总条数： " + cursor.getCount());
+
+        while (cursor.moveToNext()) {
+            LogUtil.i("--------------------------------");
+            int fieldCount = cursor.getColumnCount();
+            for (int i = 0; i < fieldCount; i++) {
+                String name = cursor.getColumnName(i);
+                String value = cursor.getString(i);
+                LogUtil.i(name + " : " + value);
+            }
+        }
+    }
+
+    /**
+     * 格式化视频播放时长: 大于等于1小时，则格式化为时分秒：01:20:00, 否则格式为分秒，如20:00
+     *
+     * @param context
+     * @param duration
+     * @return
+     */
+    public static String formatTime(Context context, long duration) {
+        String format = "mm:ss";
+
+        int hour = (int) (duration / (1000 * 60 * 60));
+        if (hour > 0) {
+            format = "HH:mm:ss";
+        }
+
+        return DateFormat.format(format, duration).toString();
+    }
+
+    public static int getCurrentMode(Context context) {
+        SharedPreferences sp = PreferenceManager
+                .getDefaultSharedPreferences(context);
+        return sp.getInt(IKeys.PLAY_MODE, AudioPlayService.MODE_ORDER);
+    }
+    
+    
+}
