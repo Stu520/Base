@@ -1,0 +1,21 @@
+import android.util.Log;
+
+/**
+ * Created by Administrator on 2016/2/9.
+ */
+public class LogUtil {
+
+    /** 是否处于调试模式，打包发布时，需要将此标识修改为false */
+    public static final boolean DEBUG = true;
+
+    private static final String TAG = "mobile_player";
+
+    public static void i(String tag, String info) {
+        if (DEBUG)
+            Log.i(tag, info);
+    }
+
+    public static void i(String info) {
+       i(TAG, info);
+    }
+}
